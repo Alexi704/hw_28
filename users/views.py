@@ -1,7 +1,7 @@
 import json
+from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Count
-from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
