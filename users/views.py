@@ -10,48 +10,21 @@ from config import settings
 from users.models import User, Location
 
 
-# class UserView(ListView):
-#     models = User
-#     queryset = User.objects.all()
-#
-#     def get(self, request, *args, **kwargs):
-#         super().get(request, *args, **kwargs)
-#         self.object_list = self.object_list.annotate(total_ads=Count('ad'))
-#
-#         paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
-#         page_number = request.GET.get('page')
-#         page_obj = paginator.get_page(page_number)
-#
-#         users = []
-#         for user in page_obj:
-#             users.append({
-#                 'id': user.id,
-#                 'first_name': user.first_name,
-#                 'last_name': user.last_name,
-#                 'user_name': user.user_name,
-#                 'role': user.role,
-#                 'age': user.age,
-#                 'location': list(map(str, user.locations.all())),
-#                 'total_ads': len(self.object_list),
-#             })
-#             response = {
-#                 'items': users,
-#                 'num_page': page_obj.paginator.num_pages,
-#                 'total': page_obj.paginator.count
-#             }
-#             return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
-
 class UserView(ListView):
     models = User
     queryset = User.objects.all()
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        self.object_list = self.object_list.order_by("id")
+        self.object_list = self.object_list.annotate(total_ads=Count('ad'))
 
-        response = []
+        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        users = []
         for user in self.object_list:
-            response.append({
+            users.append({
                 'id': user.id,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
@@ -61,9 +34,12 @@ class UserView(ListView):
                 'location': list(map(str, user.locations.all())),
                 'total_ads': len(self.object_list),
             })
+        response = {
+            'items': users,
+            'num_page': page_obj.paginator.num_pages,
+            'total': page_obj.paginator.count
+        }
         return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
-
-
 
 
 class UserDetailView(DetailView):
@@ -156,4 +132,3 @@ class UserDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
         return JsonResponse({"status": "ok/delete"}, status=200)
-

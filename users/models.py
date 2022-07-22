@@ -20,7 +20,6 @@ class User(models.Model):
         ('moderator', 'Модеатор'),
         ('admin', 'Админ'),
     ]
-
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     user_name = models.CharField(max_length=50)
